@@ -87,6 +87,13 @@ class ModificarReservaForm(forms.ModelForm):
         model = Reserva
         fields = ['mesa', 'fecha_reserva', 'nombre_cliente', 'telefono_cliente', 'estado', 'numero_personas', 'comentarios']
 
+#cambia el estado de la reserva solamente
+class CambiarEstadoReservaForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = [ 'estado']
+
+
 # Formulario para Compra
 class CompraForm(forms.ModelForm):
     class Meta:

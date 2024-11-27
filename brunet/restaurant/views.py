@@ -61,6 +61,10 @@ def crear_pedido(request, mesa_id):
     mesa = get_object_or_404(Mesa, id=mesa_id)
     categorias = Categoria.objects.all()  # Filtrar por categorías
     platos = Menu.objects.filter(disponible=True)  # Todos los platos disponibles
+    # Actualizar el estado de la mesa a "ocupada"
+    mesa.estado = 'ocupada'
+    mesa.save()  # Guardar los cambios en la base de datos
+
 
     if request.method == 'POST':
         # Procesar el pedido enviado por el usuario
@@ -288,7 +292,6 @@ def eliminar_pago(request, pago_id):
 
 
 
-
 # Vista de Reservas
 @login_required
 def reservas(request):
@@ -302,7 +305,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from .forms import ReservaForm, ModificarReservaForm
+from .forms import ReservaForm, ModificarReservaForm,CambiarEstadoReservaForm
 from .models import Reserva
 
 # Creación de Reserva
@@ -312,10 +315,25 @@ def crear_reserva(request):
         form = ReservaForm(request.POST)
         if form.is_valid():
             reserva = form.save(commit=False)  # No guardar aún en la base de datos
+            '''
             reserva.usuario = request.user  # Asignar el usuario actual
             reserva.save()  # Ahora guardar en la base de datos
             messages.success(request, 'Reserva creada con éxito.')
             return redirect('reservas')  # Redirige a la lista de reservas o donde sea necesario
+            '''
+            # Obtener los datos del formulario
+            mesa = reserva.mesa
+            fecha = reserva.fecha_reserva
+            # Verificar si ya existe una reserva para esa mesa en esa fecha
+            if Reserva.objects.filter(mesa=mesa, fecha_reserva=fecha).exists():
+                messages.error(request, f'La mesa {mesa} ya está reservada para la fecha seleccionada.')
+            else:
+                reserva.usuario = request.user
+                reserva.save()
+                messages.success(request, 'Reserva creada con éxito.')
+                return redirect('reservas')  # Redirige a la lista de reservas
+
+
     else:
         form = ReservaForm()
     return render(request, 'reserva/crear_reserva.html', {'form': form})
@@ -334,6 +352,19 @@ def modificar_reserva(request, reserva_id):
         form = ModificarReservaForm(instance=reserva)
     return render(request, 'reserva/editar_reserva.html', {'form': form})
 
+#modifcar estado reserva
+@login_required
+def modificar_estado_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+    if request.method == 'POST':
+        form = CambiarEstadoReservaForm(request.POST, instance=reserva)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Reserva modificada con éxito.')
+            return redirect('reservas')
+    else:
+        form = CambiarEstadoReservaForm(instance=reserva)
+    return render(request, 'reserva/cambiar_estado.html', {'form': form,'reserva':reserva}) #datos on editables
 
 # Eliminación de Reserva
 @login_required
@@ -541,12 +572,14 @@ def eliminar_compra(request, pk):
         compra.delete()
         return redirect('compras')
     return render(request, 'compra/eliminar_compra.html', {'compra': compra})
+
 # Mesas
 @login_required
 def lista_mesas(request):
     mesas = Mesa.objects.all()
     return render(request, 'mesa/mesas.html', {'mesas': mesas})
 @login_required
+
 def crear_mesa(request):
     if request.method == 'POST':
         form = MesaForm(request.POST)
@@ -556,6 +589,7 @@ def crear_mesa(request):
     else:
         form = MesaForm()
     return render(request, 'mesa/crear_mesa.html', {'form': form})
+
 @login_required
 def editar_mesa(request, pk):  
     mesa = get_object_or_404(Mesa, id=pk)
@@ -568,6 +602,7 @@ def editar_mesa(request, pk):
         form = MesaForm(instance=mesa)
     return render(request, 'mesa/editar_mesa.html', {'form': form})
 @login_required
+
 def eliminar_mesa(request, mesa_id):
     mesa = get_object_or_404(Mesa, id=mesa_id)
     mesa.delete()
@@ -773,7 +808,7 @@ class CustomLoginView(auth_views.LoginView):
     template_name = 'login.html'  
 
 
-#pagina para clinetes.
+#pagina para clientes.
 from django.shortcuts import render
 from .models import Categoria, Menu, Mesa
 
@@ -1379,6 +1414,7 @@ def obtener_datos_grafico_metodos_pago(request):
 
 
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from .models import Usuario
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import Usuario
@@ -1402,7 +1438,6 @@ def listar_usuarios(request):
     usuarios = Usuario.objects.all()
     return render(request, 'usuarios/listar_usuarios.html', {'usuarios': usuarios})
 
-
 @login_required
 def editar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id=usuario_id)
@@ -1415,6 +1450,7 @@ def editar_usuario(request, usuario_id):
     else:
         form = CustomUserChangeForm(instance=usuario)
     return render(request, 'usuarios/editar_usuario.html', {'form': form})
+
 
 @login_required
 def eliminar_usuario(request, usuario_id):
@@ -1430,6 +1466,7 @@ def eliminar_usuario(request, usuario_id):
 from django.contrib.auth import update_session_auth_hash
 from .models import Usuario
 from .forms import CustomPasswordResetForm
+
 
 @login_required
 def restablecer_contraseña(request, usuario_id):
@@ -1454,6 +1491,7 @@ def restablecer_contraseña(request, usuario_id):
 from .forms import CustomUserCreationForm
 from .models import Usuario
 
+
 def registrar_usuario(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -1473,6 +1511,7 @@ def registrar_usuario(request):
 
 
 from .forms import CustomPasswordResetForm
+
 
 def recuperar_contraseña(request):
     mostrar_nueva_contraseña = False  # Controla si se muestran los campos de nueva contraseña
