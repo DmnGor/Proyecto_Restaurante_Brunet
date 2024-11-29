@@ -559,6 +559,8 @@ def editar_compra(request, pk):
     else:
         form = CompraForm(instance=compra)
         detalle_formset = DetalleCompraFormSet(instance=compra)
+        #form.save()  # Guardamos la compra editada
+        #detalle_formset.save()  # Guardamos los detalles de la compra
 
     return render(request, 'compra/editar_compra.html', {
         'form': form,

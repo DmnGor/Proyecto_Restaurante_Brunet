@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h1>Apertura de Caja</h1>
 
-    {% if request.user.is_superuser or request.user.tipo_usuario == 'admin' or request.user.tipo_usuario == 'cajero' %}
+    {% if request.user.is_superuser or request.user.tipo_usuario == 'cajero' %}
     
         {% if error_message %}
             <div class="alert alert-danger">

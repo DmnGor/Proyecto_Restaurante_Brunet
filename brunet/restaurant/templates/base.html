@@ -33,19 +33,19 @@
                     </li>
                     {% endif %}
                     
-                    {% if request.user.tipo_usuario != 'mesero' and request.user.tipo_usuario == 'cajero' and request.user.tipo_usuario != 'cocinero'%}
+                    {% if request.user.tipo_usuario == 'mesero' and request.user.tipo_usuario == 'cajero' and request.user.tipo_usuario == 'cocinero'%}
                     <li class="nav-item {% if request.resolver_match.url_name == 'cliente' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'cliente' %}">Página del Cliente</a>
                     </li>
                     {% endif %}
 
-                    {% if request.user.tipo_usuario == 'mesero' or request.user.tipo_usuario == 'cocinero' or request.user.tipo_usuario == 'cajero' %}
+                    {% if request.user.tipo_usuario == 'mesero' or request.user.tipo_usuario == 'cocinero' or request.user.tipo_usuario == 'cajero' or request.user.tipo_usuario == 'admin' %}
                     <li class="nav-item {% if request.resolver_match.url_name == 'pedidos_activos' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'pedidos_activos' %}">Pedidos</a>
                     </li>
                     {% endif %}
 
-                    {% if request.user.tipo_usuario == 'cajero' %}
+                    {% if request.user.tipo_usuario == 'cajero' or request.user.tipo_usuario == 'admin' %}
                     <li class="nav-item {% if request.resolver_match.url_name == 'reservas' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'reservas' %}">Reservas</a>
                     </li>
@@ -58,19 +58,19 @@
                     </li>
                    -->
 
-                    {% if request.user.tipo_usuario == 'cajero'%}
+                    {% if request.user.tipo_usuario == 'cajero' or request.user.tipo_usuario == 'admin' or request.user.tipo_usuario == 'mesero'%}
                     <li class="nav-item {% if request.resolver_match.url_name == 'lista_mesas' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'lista_mesas' %}">Mesas</a>
                     </li>
                     {% endif %}
 
-                    {% if request.user.tipo_usuario == 'cajero' or request.user.tipo_usuario == 'cocinero' %}
+                    {% if request.user.tipo_usuario == 'cajero' or request.user.tipo_usuario == 'cocinero' or request.user.tipo_usuario == 'admin' %}
                     <li class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'inventario' %}">Inventario</a>
                     </li>
                     {% endif %}
 
-                    {% if request.user.tipo_usuario == 'cajero' %}
+                    {% if request.user.tipo_usuario == 'cajero' or request.user.tipo_usuario == 'admin' %}
                     <li class="nav-item {% if request.resolver_match.url_name == 'compras' %}active{% endif %}">
                         <a class="nav-link" href="{% url 'compras' %}">Compras</a>
                     </li>

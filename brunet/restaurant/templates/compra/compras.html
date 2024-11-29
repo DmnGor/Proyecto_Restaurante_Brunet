@@ -180,9 +180,9 @@
     <ul class="compras-list">
         {% for compra in compras %}
         <li class="compra-item">
-            <span>{{ compra.proveedor.nombre_proveedor }}</span> 
-            <span>{{ compra.fecha_compra }}</span>
-            <span>${{ compra.total }}</span>
+            <span>Proveedor: {{ compra.proveedor.nombre_proveedor }}</span> 
+            <span>Fecha de compra: {{ compra.fecha_compra }}</span>
+            <span>Total: ${{ compra.total }}</span>
             <div class="detalle">
                 {{ compra.detalle }} 
             </div>
